@@ -11,5 +11,5 @@
   - mark2.1: Impact sound vs. Others
   - mark2.2: Water-related sounds(shower/toilet) vs. Others
   - mark2.3: Construction drill sounds vs. Others
-  - mark2.4: Everyday noise(daily conversations, ambient noise) vs. Others
+  - mark2.4: Everyday noise(daily conversations, ambient noise) vs. Others  
 ▪ We are currently in the process of updating the dataset and modifying the classification strategy accordingly. Additionally, the text embedding component from the mark1 will be removed as it is no longer required in the new design.    
