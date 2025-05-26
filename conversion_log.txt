@@ -1,0 +1,28 @@
+=== 변환 로그 시작 ===
+변환 완료: apartment_ceiling1_0430PM.m4a -> apartment_ceiling1_0430PM.wav
+변환 완료: apartment_ceiling2_0430PM.m4a -> apartment_ceiling2_0430PM.wav
+변환 완료: apartment_ceiling3_0430PM.m4a -> apartment_ceiling3_0430PM.wav
+변환 완료: apartment_ceiling_4PM.m4a -> apartment_ceiling_4PM.wav
+변환 완료: apartment_dropSound_4AM.m4a -> apartment_dropSound_4AM.wav
+변환 완료: apartment_footStep_0306PM.m4a -> apartment_footStep_0306PM.wav
+변환 완료: apartment_thumping_7PM.m4a -> apartment_thumping_7PM.wav
+변환 완료: apartment_thunpingAndDragging_7PM.m4a -> apartment_thunpingAndDragging_7PM.wav
+변환 완료: background_computerNoise.m4a -> background_computerNoise.wav
+변환 완료: background_fishTankNoise_clockNoise.m4a -> background_fishTankNoise_clockNoise.wav
+변환 완료: background_motorcycle.m4a -> background_motorcycle.wav
+변환 완료: background_motorcycleStarterNoise.m4a -> background_motorcycleStarterNoise.wav
+변환 완료: background_verandaBird_3PM.m4a -> background_verandaBird_3PM.wav
+변환 완료: background_verandaCar_0255PM.m4a -> background_verandaCar_0255PM.wav
+변환 완료: background_veranda_carSound_PM.m4a -> background_veranda_carSound_PM.wav
+변환 완료: daily_chairPulling_0302PM.m4a -> daily_chairPulling_0302PM.wav
+변환 완료: daily_doorbellNoise.m4a -> daily_doorbellNoise.wav
+변환 완료: daily_doorSound.m4a -> daily_doorSound.wav
+변환 완료: daily_NewsSound_1M.m4a -> daily_NewsSound_1M.wav
+변환 완료: daily_NewsSound_1W.m4a -> daily_NewsSound_1W.wav
+변환 완료: daily_ThreeMenTalking.m4a -> daily_ThreeMenTalking.wav
+변환 완료: daily_TVNoise_1M3W.m4a -> daily_TVNoise_1M3W.wav
+총 22개의 m4a 파일 변환 완료
+
+총 0개의 기존 wav 파일 복사 완료
+
+최종적으로 data_wav 폴더에는 총 24개의 wav 파일이 존재합니다.

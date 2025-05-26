@@ -1,0 +1,118 @@
+▪ noise_detection_added3 모델
+
+
+<<적용 흐름 간단 정리>>
+Step1: [사람이 직접 라벨링한 소음 100개] -> Teacher 모델 학습 (ViLD-text)
+Step2: [Unlabeled 소음 1,000개] → Teacher가 soft label 제공 -> Student가 ViLD-image로 따라 학습
+Step3: [ViLD-text output] + [ViLD-image output] -> ViLD-ensemble 가중 평균
+최종 예측 결과: 층간 / 일상 / 배경 분리  --> 논문 매핑이 이게 제일 쉬움
+
+
+<<전체 워크플로우 연결>>
+1. generate_dataset_index.py -> dataset_index.csv
+2. teacher_train.py -> teacher_encoder.pth, teacher_classifier.pth
+3. extract_soft_label.py -> soft_labels.pkl
+4. student_train.py -> student_encoder.pth, student_head.pth
+
+<<주의>>
+extract_soft_label.py: 클래스 임베딩 일치 보장
+teacher_train.py와 완전히 같은 방식으로 라벨 순서 -> 문장 -> 임베딩 생성해야 classifier(region_embedding, class_text_embeddings)가 일관성 유지
+
+
+====모=델=성=능=판=단======================================
+1. Teacher 모델의 Val Loss 기준
+- 10 이하면 양호
+- 5 이하면 좋음
+- 2~3 이하면 매우 훌륭한 zero-shot 표현 학습 성공 가능성
+=> 현재 오디오 개수가 22개 수준으로 적어서 오버피팅/언더피팅
+그 어딘가에서 좀 불안정한듯.
+
+2. Student 모델의 Val Loss 기준
+* Student는 teacher의 embedding (soft label)을 재현하는 게 목적.
+- Val Loss가 5 이하이면 꽤 잘 따라한 상태
+- 1 ~ 3 이하면 teacher embedding과 잘 align된 상태
+- 0.5 이하면 매우 성공적인 모사(이상적)
+
+====구=현=기=능===========================================
+[Teacher, Student 모두 동일 적용]
+0. train_loss_history, val_loss_history를 리스트로 기록하고, Epoch마다 loss 출력.
+1. validation
+2. 학습 중 loss 추이 시각화
+  - loss_curve_train_val.png
+3. 학습 종료 조건(학습 시간 단축) Early Stopping 기능
+  - patience 기준 초과시 조기 종료
+4. Best Model 저장 기능
+  - 가장 낮은 validation loss를 기록한 모델을 best_teacher_encoder.pth, best_teacher_classifier.pth로 저장.
+
+[파일 이름 요약]
+- 마지막 모델: 	teacher_encoder.pth, teacher_classifier.pth
+- 최고의 모델:	best_teacher_encoder.pth, best_teacher_classifier.pth
+- 손실 그래프:	loss_curve_train_val.png
+
+[mel shape 설명]
+[1, 1, 64, 101]는 다음과 같은 차원 구조를 가짐:
+1: 배치 사이즈 (batch size), 한 번에 하나의 입력 처리
+1: 채널 수 (channel), 오디오 스펙트로그램은 일반적으로 1채널 이미지처럼 사용됨
+64: 멜 주파수 축 (mel frequency bins), 보통 64개 bin 사용
+101: 시간축 (time frames), 약 1초 길이의 오디오에서 추출된 프레임 수
+
+[전처리 과정 요약]
+1. 오디오를 1초 단위로 분할하고 .wav 형식으로 변환함 (convert_m4a_to_wav.py)
+2. 파일 이름 규칙에 따라 수동으로 클래스 라벨 지정 (층간소음 / 일상소음 / 배경소음)
+3. 오디오를 mel spectrogram으로 변환하고 normalize_mel_shape()를 통해 모델 입력 형식으로 정규화
+4. 전체 데이터의 경로와 라벨 정보를 json 형식으로 정리하여 학습 데이터셋 인덱스를 구성함
+=> 결과적으로, 이이 모델의 전처리는 오디오 분할, 수동 라벨링, mel 변환, 정규화로 이루어져 있음.
+
+====앞=으=로=할=일======================================
+[현재 모델: mark1 구현]
+- 지금까지 Teacher 모델은 층간소음(apartment), 일상소음(daily), 배경소음(background) 전부를 학습한 버전
+- 학습된 클래스 수: 3개
+- 클래스 종류: 층간소음, 일상소음, 배경소음
+- 학습 목적: 3개의 클래스로 분류된 Teacher 모델 구현
+
+[전체 흐름 정리]
+0. downstream task(층간소음/일상소음 분류) -- 직전 단계까지 왔음
+1. Zero-shot 평가 
+  - 기존 데이터 유형 말고 새로운 소음 유형 갖다가 분류할 수 있는지 없는지 모델의 '일반화 능력' 검증
+2. 오디오 분류 정확도 평가
+  - 성능 평가
+3. Ensemble 구조 개선
+  - ViLD-text와 ViLD-image 결합한 구조를 적용하여 성능 개선 
+>> 이 세가지 전부 논문에 나온것.
+
+
+[mark1 구현 후 mark2, mark3 구현]
+- 2개의 클래스로 분류된된 Teacher 모델 2개 구축 후 성능비교 및 상호보완
+1. mark2: "층간소음 vs 기타"
+2. mark3: "일상소음 vs 기타"
+
+<구상 방향>
+- dataset_index.csv를 필터링해서 apartment_noise와 나머지를 재구성 or
+- self.classes = ["apartment_noise", "other_noise"] 식으로 구성.
+
+=======================================================
+[터미널에서 학습 중단하는법]
+1. 일시정지: ctrl + Z (다시실행: fg)
+2. 완전 종료: ctrl + C
+=======================================================
+
+====디=버=깅=참=고=사=항================================
+1. vild_parser.py
+2. extract_soft_label.py
+위의 파일들에 핵심 디버깅 내용이 있음. 필요시 활성화.
+
+====시=드=설=정========================================
+시드설정 이유: 재현성(reproducibility)
+- 딥러닝 훈련시 무작위로 작동
+1) 모델의 초기 가중치
+2) 학습 데이터의 셔플 순서
+3) Dropout 같은 랜덤한 정규화 기법
+4) 데이터 증강 시 무작위 변형(RandomCrop, RandopFilp, etc)
+위와 같은 요소들이 매번 다르게 동작하면
+동일 콕드와 동일 데이터로 실행해도 결과가 달라짐
+
+그런데 시드 설정해서 무작위성을 고정하면
+- 모델이 매번 동일하게 초기화되고, 
+- 데이터도 같은 순서로 셔플되고,
+- 학습 결과 역시 일정하게 유지됨.
+=> 시드 설정 = 실행행을 다시 했을 때 같음 결과를 얻기 위한 장치치

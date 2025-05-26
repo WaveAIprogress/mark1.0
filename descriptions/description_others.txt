@@ -1,0 +1,22 @@
+1. 출력 로그 다 txt로 나오게 하는 처리
+2. 컨퓨전 매트릭스 부분 조정(지금 3개 예측 중, 데이터셋에서 비율 맞춰서 생성하게 할 예정,
+데이터가 지금 많아서 컨퓨전매트릭스 예측하도록 해도 좋을 듯), 그래프 예쁘게
+3. apartment/daily/background 비율이 어떻게 된건지
+4. pth 파일 생기는 경로 정리, png 생기는 경로 정리
+5. confusion matrix에서 precision/recall/fi-score/accuracy
+할 예정... 
+
+!! 정확도 나락간거 고치기
+1) 데이터 클래스 개수 균형 재검토(1:1:1) 맞춰라
+데이터 많아서 사달난건 아님
+2) 얼리스타핑 파라미터 확인해라
+=> patience = 3으로 바꿈.
+3) Dropout 레이어 추가 + 데이터 증감
+  - teacher 모델 과적합 방지
+4) validation loss 진동시 smooth 처리
+  - exponential moving average 등 적용
+
+내가 봤을땐 데이터수 맞추고
+얼리스타핑 맞추면 얼추 가능해짐
+
++) 학습 시간 단축을 위해 슬라이딩 윈도우 알고리즘 적용 고려
